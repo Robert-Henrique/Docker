@@ -1,0 +1,18 @@
+## Build
+FROM golang:alpine AS builder
+
+WORKDIR /app
+COPY go.mod ./
+COPY hello.go ./
+
+# Build the binary.
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/hello
+
+## Deploy
+FROM scratch
+
+WORKDIR /
+
+COPY --from=builder /go/bin/hello /go/bin/hello
+
+ENTRYPOINT ["/go/bin/hello"]
